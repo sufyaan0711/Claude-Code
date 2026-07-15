@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { RevealText } from "@/components/ui/RevealText";
+import { Select } from "@/components/ui/Select";
 import { privateDiningOccasions } from "@/lib/data/private-dining";
 
 const fieldClasses =
@@ -142,14 +143,15 @@ export function EnquiryForm() {
                     <label htmlFor="pd-occasion" className={labelClasses}>
                       Occasion <span className="text-warm-grey normal-case">(optional)</span>
                     </label>
-                    <select id="pd-occasion" name="occasion" defaultValue="" className={fieldClasses}>
-                      <option value="">Select</option>
-                      {privateDiningOccasions.map((occasion) => (
-                        <option key={occasion} value={occasion}>
-                          {occasion}
-                        </option>
-                      ))}
-                    </select>
+                    <Select
+                      id="pd-occasion"
+                      name="occasion"
+                      placeholder="Select"
+                      options={privateDiningOccasions.map((occasion) => ({
+                        value: occasion,
+                        label: occasion,
+                      }))}
+                    />
                   </div>
 
                   <div>

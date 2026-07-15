@@ -20,11 +20,14 @@ const HERO_POSTER = "/images/hero-poster.jpg";
  * a known gap between the HTML attribute and the DOM property that a
  * purely client-side remount (e.g. navigating away and back) doesn't hit,
  * which matches the "only works after visiting another page" symptom.
- * Setting `.muted`/`.defaultMuted` imperatively via a ref before calling
- * `.play()` closes that gap. The poster stays visible — and the browser
- * never gets a chance to show its own "blocked autoplay" play button —
- * until the video actually fires `playing`; if autoplay is refused
- * outright, the poster simply stays up.
+ * Setting `.muted`/`.defaultMuted`/`.playsInline` imperatively via a ref
+ * before calling `.play()` closes that gap, and retrying on
+ * `loadedmetadata`/`canplay` (not just on mount) covers the case where the
+ * browser can't attempt playback yet because the video hasn't buffered
+ * enough to autoplay on the very first attempt. The poster stays visible —
+ * and the browser never gets a chance to show its own "blocked autoplay"
+ * play button — until the video actually fires `playing`; if autoplay is
+ * refused outright, the poster simply stays up.
  */
 function HeroVideo({ className }: { className?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -36,6 +39,7 @@ function HeroVideo({ className }: { className?: string }) {
 
     video.muted = true;
     video.defaultMuted = true;
+    video.playsInline = true;
 
     const attemptPlay = () => {
       const playPromise = video.play();
@@ -57,12 +61,16 @@ function HeroVideo({ className }: { className?: string }) {
 
     video.addEventListener("playing", handlePlaying);
     video.addEventListener("pause", handlePause);
+    video.addEventListener("loadedmetadata", attemptPlay);
+    video.addEventListener("canplay", attemptPlay);
     document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("pageshow", handlePageShow);
 
     return () => {
       video.removeEventListener("playing", handlePlaying);
       video.removeEventListener("pause", handlePause);
+      video.removeEventListener("loadedmetadata", attemptPlay);
+      video.removeEventListener("canplay", attemptPlay);
       document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("pageshow", handlePageShow);
     };
@@ -88,7 +96,6 @@ function HeroVideo({ className }: { className?: string }) {
           "absolute inset-0 z-0 h-full w-full object-cover object-center transition-opacity duration-700 ease-out",
           isPlaying ? "opacity-100" : "opacity-0"
         )}
-        src="/videos/hero.mp4"
         poster={HERO_POSTER}
         autoPlay
         muted
@@ -98,7 +105,10 @@ function HeroVideo({ className }: { className?: string }) {
         controls={false}
         disablePictureInPicture
         aria-hidden="true"
-      />
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+        <source src="/videos/hero.webm" type="video/webm" />
+      </video>
     </div>
   );
 }
