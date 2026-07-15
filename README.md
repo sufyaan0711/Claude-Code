@@ -41,16 +41,18 @@ Push this repository to GitHub and import it at
 [vercel.com/new](https://vercel.com/new) — no configuration is required
 beyond the default Next.js build settings.
 
-## Adding real photography
+## Photography and hero video
 
-No real photographs are included. Every image slot renders a tasteful dark
-placeholder (preserving the correct aspect ratio) until you drop a file in
-with the matching name. See **[IMAGE-GUIDE.md](./IMAGE-GUIDE.md)** for the
-full file list, recommended dimensions, and styling guidance.
+Real photography (`.png`) lives in `/public/images` and the homepage hero
+video lives at `/public/videos/hero.mp4`. If any image file is ever
+missing, its slot renders a tasteful dark placeholder (preserving the
+correct aspect ratio) instead of breaking — see
+**[IMAGE-GUIDE.md](./IMAGE-GUIDE.md)** for the full file list, recommended
+dimensions, and styling guidance.
 
-In short: add files to `/public/images` using the filenames already
+To replace a photo, overwrite the file at its existing path (filenames are
 referenced in `lib/data/menu.ts`, `lib/data/private-dining.ts`, and the
-section components — nothing else needs to change.
+section components) — nothing else needs to change.
 
 ## Project structure
 

@@ -1,13 +1,13 @@
 # Image Guide
 
-This project ships without real photography. Every image slot renders a
-tasteful dark placeholder (via `ImageWithFallback`) until you add the file —
-the site never breaks, and layouts never shift, because every placeholder
-holds the same aspect ratio the real photo will use.
+Real photography and the hero video are included in `/public/images` and
+`/public/videos`. Every image slot still renders a tasteful dark
+placeholder (via `ImageWithFallback`) if its file is ever missing — the
+site never breaks, and layouts never shift, because every placeholder
+holds the same aspect ratio the real photo uses.
 
-Add your own photographs to `/public/images` using the **exact filenames**
-below (all lowercase, `.jpg`). Filenames are the only thing that needs to
-match — everything else (captions, alt text, layout) is already wired up.
+Filenames are lowercase and case-sensitive. Everything else (captions, alt
+text, layout, aspect ratios) is already wired up to these exact paths.
 
 ## Photography style
 
@@ -24,29 +24,47 @@ For a consistent, high-end result across all images:
 
 | File | Orientation | Minimum size | Used in |
 |---|---|---|---|
-| `hero.jpg` | Landscape | 2400 × 1600 | Homepage hero, full-bleed |
-| `intro-detail.jpg` | Portrait | 1200 × 1600 | Introduction section detail image |
-| `dish-bone-marrow.jpg` | Landscape | 1400px shortest side | Signature menu |
-| `dish-beetroot.jpg` | Portrait | 1400px shortest side | Signature menu |
-| `dish-ribeye.jpg` | Landscape (wide) | 1400px shortest side | Signature menu — dominant item |
-| `dish-lamb.jpg` | Square | 1400px shortest side | Signature menu |
-| `dish-maitake.jpg` | Portrait | 1400px shortest side | Signature menu |
-| `dish-honey-tart.jpg` | Square | 1400px shortest side | Signature menu |
-| `story-wide.jpg` | Landscape | 2400 × 1500 | Expanding scroll-story image |
-| `fire-detail.jpg` | Portrait or landscape | 1800px shortest side | Fire philosophy section |
-| `private-dining.jpg` | Landscape | 2000 × 1400 | Private dining teaser (homepage) |
-| `private-hero.jpg` | Landscape | 2000px wide | Private dining page hero |
-| `private-room.jpg` | Portrait | 2000px wide | Private dining page, room details |
-| `private-table.jpg` | Landscape (wide) | 2000px wide | Private dining page, cinematic image |
-| `reservation-background.jpg` | Landscape | 2200 × 1400 | Final reservation call-to-action |
+| `intro-detail.png` | Portrait | 1200 × 1600 | Introduction section detail image |
+| `dish-bone-marrow.png` | Landscape | 1400px shortest side | Signature menu |
+| `dish-beetroot.png` | Portrait | 1400px shortest side | Signature menu |
+| `dish-ribeye.png` | Landscape (wide) | 1400px shortest side | Signature menu — dominant item |
+| `dish-lamb.png` | Square | 1400px shortest side | Signature menu |
+| `dish-maitake.png` | Portrait | 1400px shortest side | Signature menu |
+| `dish-honey-tart.png` | Square | 1400px shortest side | Signature menu |
+| `story-wide.png` | Landscape | 2400 × 1500 | Expanding scroll-story image |
+| `fire-detail.png` | Portrait or landscape | 1800px shortest side | Fire philosophy section |
+| `private-dining.png` | Landscape | 2000 × 1400 | Private dining teaser (homepage) |
+| `private-hero.png` | Landscape | 2000px wide | Private dining page hero |
+| `private-room.png` | Portrait | 2000px wide | Private dining page, room details |
+| `private-table.png` | Landscape (wide) | 2000px wide | Private dining page, cinematic image |
+| `reservation-background.png` | Landscape | 2200 × 1400 | Final reservation call-to-action |
+
+## Hero video
+
+The homepage hero uses a video instead of a static image.
+
+| | |
+|---|---|
+| File | `hero.mp4` |
+| Type | Landscape video |
+| Recommended resolution | 1920 × 1080 |
+| Location | `/public/videos/hero.mp4` |
+| Used in | Homepage cinematic hero |
+| Recommended format | MP4 using H.264 |
+| Recommended behaviour | Muted, autoplay, loop and `playsInline` |
+
+The video is rendered with a plain HTML `<video>` element (not `next/image`)
+so it can autoplay, loop and stay muted with no controls. On desktop, with
+motion allowed, it sits in a cinematic scroll-linked frame that expands
+toward full width as the visitor scrolls (see `components/sections/Hero.tsx`);
+on mobile or under `prefers-reduced-motion` it simply fills a normal
+full-height hero instead.
 
 ## How the fallback works
 
-`components/ui/ImageWithFallback.tsx` wraps `next/image`. If a file 404s,
-the component swallows the error and renders a dark placeholder in the same
-box instead of a broken image icon. In development only, the expected
-filename is shown faintly in the placeholder so it is obvious what to add
-and where — this hint is never shown in production.
-
-Once you add a real file at the matching path, it replaces the placeholder
-automatically — no code changes required.
+`components/ui/ImageWithFallback.tsx` checks whether each file exists on
+disk on the server (via `fs.existsSync`), so a missing photo never causes a
+failed network request in the browser — it renders a dark placeholder in
+the same box instead, with the expected filename shown faintly in
+development only (never in production). Add or replace a file at the
+matching path and rebuild — no code changes required.

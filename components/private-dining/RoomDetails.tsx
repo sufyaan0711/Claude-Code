@@ -42,7 +42,7 @@ export function RoomDetails() {
           <div className="col-span-12 lg:col-span-5 lg:col-start-8">
             <RevealText delay={0.15}>
               <ImageWithFallback
-                src="/images/private-room.jpg"
+                src="/images/private-room.png"
                 alt="The Ember House private dining room set for a group"
                 className="aspect-[4/5] w-full"
                 sizes="(min-width: 1024px) 40vw, 100vw"

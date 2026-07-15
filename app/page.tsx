@@ -15,23 +15,13 @@ export default function Home() {
     <>
       <Header />
       <main id="main">
-        <Hero
-          media={
-            <ImageWithFallback
-              src="/images/hero.jpg"
-              alt="Wood-fired dishes cooked over open flame at Ember House"
-              className="absolute inset-0 h-full w-full"
-              priority
-              sizes="100vw"
-            />
-          }
-        />
+        <Hero />
         <IntroSection />
         <SignatureMenu />
         <ExpandingStory
           media={
             <ImageWithFallback
-              src="/images/story-wide.jpg"
+              src="/images/story-wide.png"
               alt="The Ember House dining room"
               className="h-full w-full"
               sizes="100vw"
@@ -39,7 +29,7 @@ export default function Home() {
           }
           reducedMotionMedia={
             <ImageWithFallback
-              src="/images/story-wide.jpg"
+              src="/images/story-wide.png"
               alt="The Ember House dining room"
               className="aspect-video w-full"
               sizes="90vw"
@@ -49,7 +39,7 @@ export default function Home() {
         <FirePhilosophy
           media={
             <ImageWithFallback
-              src="/images/fire-detail.jpg"
+              src="/images/fire-detail.png"
               alt="Detail of the open flame grill at Ember House"
               className="h-full w-full"
               sizes="(min-width: 1024px) 45vw, 100vw"
@@ -61,7 +51,7 @@ export default function Home() {
         <ReservationCTA
           media={
             <ImageWithFallback
-              src="/images/reservation-background.jpg"
+              src="/images/reservation-background.png"
               alt="The dining room at Ember House lit for evening service"
               className="absolute inset-0 h-full w-full"
               sizes="100vw"

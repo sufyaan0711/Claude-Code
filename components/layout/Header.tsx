@@ -34,8 +34,15 @@ export function Header() {
             isScrolled ? "py-4" : "py-6 lg:py-8"
           )}
         >
-          <Logo size="sm" showSub={false} className="min-w-0 shrink lg:hidden" />
-          <Logo size="md" showSub className="hidden lg:flex" />
+          {/* Wrapping divs (rather than passing "hidden"/"flex" straight into
+              Logo's own className) avoid a display-property cascade clash
+              with Logo's internal `inline-flex` base class. */}
+          <div className="min-w-0 shrink lg:hidden">
+            <Logo size="sm" showSub={false} />
+          </div>
+          <div className="hidden lg:flex">
+            <Logo size="md" showSub />
+          </div>
 
           <nav className="hidden items-center gap-10 lg:flex" aria-label="Primary">
             {navigation.map((link) => (

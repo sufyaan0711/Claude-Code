@@ -42,7 +42,7 @@ export function IntroSection() {
           <div className="col-span-12 lg:col-span-5 lg:col-start-8">
             <RevealText delay={0.15} className="h-full">
               <ImageWithFallback
-                src="/images/intro-detail.jpg"
+                src="/images/intro-detail.png"
                 alt="Detail of open flame and seasoning at Ember House"
                 className="aspect-[4/5] w-full"
                 sizes="(min-width: 1024px) 40vw, 100vw"

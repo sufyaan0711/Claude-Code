@@ -7,6 +7,7 @@ import { useFocusTrap } from "@/lib/useFocusTrap";
 import { EASE_EDITORIAL } from "@/lib/animation";
 import { reservationTimes, partySizes } from "@/lib/data/openingHours";
 import { restaurant } from "@/lib/data/restaurant";
+import { Select } from "@/components/ui/Select";
 
 const fieldClasses =
   "w-full border-b border-warm-grey/25 bg-transparent py-3 font-sans text-sm text-cream placeholder:text-slate focus:border-brass focus:outline-none";
@@ -159,16 +160,14 @@ export function ReservationPanel() {
                       <label htmlFor="res-time" className={labelClasses}>
                         Time
                       </label>
-                      <select id="res-time" name="time" defaultValue="" className={fieldClasses} aria-invalid={Boolean(errors.time)} aria-describedby={errors.time ? "res-time-error" : undefined}>
-                        <option value="" disabled>
-                          Select
-                        </option>
-                        {reservationTimes.map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
+                      <Select
+                        id="res-time"
+                        name="time"
+                        placeholder="Select"
+                        options={reservationTimes.map((time) => ({ value: time, label: time }))}
+                        aria-invalid={Boolean(errors.time)}
+                        aria-describedby={errors.time ? "res-time-error" : undefined}
+                      />
                       {errors.time && <p id="res-time-error" className="mt-2 font-sans text-xs text-burgundy">{errors.time}</p>}
                     </div>
                   </div>
@@ -177,25 +176,22 @@ export function ReservationPanel() {
                     <label htmlFor="res-party" className={labelClasses}>
                       Party Size
                     </label>
-                    <select
+                    <Select
                       id="res-party"
                       name="partySize"
                       value={partySize}
-                      onChange={(event) => setPartySize(event.target.value)}
-                      className={fieldClasses}
+                      onValueChange={setPartySize}
+                      placeholder="Select"
+                      options={[
+                        ...partySizes.map((size) => ({
+                          value: String(size),
+                          label: `${size} ${size === 1 ? "guest" : "guests"}`,
+                        })),
+                        { value: LARGE_PARTY, label: "9+ guests" },
+                      ]}
                       aria-invalid={Boolean(errors.partySize)}
                       aria-describedby={errors.partySize ? "res-party-error" : undefined}
-                    >
-                      <option value="" disabled>
-                        Select
-                      </option>
-                      {partySizes.map((size) => (
-                        <option key={size} value={size}>
-                          {size} {size === 1 ? "guest" : "guests"}
-                        </option>
-                      ))}
-                      <option value={LARGE_PARTY}>9+ guests</option>
-                    </select>
+                    />
                     {errors.partySize && (
                       <p id="res-party-error" className="mt-2 font-sans text-xs text-burgundy">{errors.partySize}</p>
                     )}

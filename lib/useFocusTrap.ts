@@ -33,6 +33,11 @@ export function useFocusTrap({ isOpen, onClose, containerRef }: UseFocusTrapOpti
     first?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // A nested popup (e.g. a Radix Select dropdown) that has already
+      // handled this key — closing itself and calling preventDefault in
+      // its own capture-phase listener — should not also close us.
+      if (event.defaultPrevented) return;
+
       if (event.key === "Escape") {
         onClose();
         return;

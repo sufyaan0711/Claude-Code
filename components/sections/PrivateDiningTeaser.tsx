@@ -8,7 +8,7 @@ export function PrivateDiningTeaser() {
   return (
     <section id="private-dining" className="relative scroll-mt-24 overflow-hidden">
       <ImageWithFallback
-        src="/images/private-dining.jpg"
+        src="/images/private-dining.png"
         alt="The private dining room at Ember House"
         className="absolute inset-0 h-full w-full"
         sizes="100vw"

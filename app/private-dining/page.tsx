@@ -23,7 +23,7 @@ export default function PrivateDiningPage() {
         <PrivateHero
           media={
             <ImageWithFallback
-              src="/images/private-hero.jpg"
+              src="/images/private-hero.png"
               alt="The private dining room at Ember House, set for an evening"
               className="absolute inset-0 h-full w-full"
               priority
