@@ -31,8 +31,8 @@ export default function Home() {
             <ImageWithFallback
               src="/images/story-wide.png"
               alt="The Ember House dining room"
-              className="aspect-video w-full"
-              sizes="90vw"
+              className="aspect-[4/3] w-full sm:aspect-[16/10] md:aspect-video"
+              sizes="(min-width: 768px) 90vw, 100vw"
             />
           }
         />

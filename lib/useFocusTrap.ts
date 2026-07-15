@@ -24,7 +24,24 @@ export function useFocusTrap({ isOpen, onClose, containerRef }: UseFocusTrapOpti
 
     previouslyFocused.current = document.activeElement as HTMLElement | null;
 
-    const originalOverflow = document.body.style.overflow;
+    // Lock the background with `position: fixed` rather than just
+    // `overflow: hidden` — some mobile browsers still allow touch-scrolling
+    // the body underneath an overlay with only `overflow: hidden` set. This
+    // also lets us restore the exact scroll position on close.
+    const scrollY = window.scrollY;
+    const original = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      overflow: document.body.style.overflow,
+      width: document.body.style.width,
+    };
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
     document.body.style.overflow = "hidden";
 
     const container = containerRef.current;
@@ -65,7 +82,16 @@ export function useFocusTrap({ isOpen, onClose, containerRef }: UseFocusTrapOpti
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.position = original.position;
+      document.body.style.top = original.top;
+      document.body.style.left = original.left;
+      document.body.style.right = original.right;
+      document.body.style.width = original.width;
+      document.body.style.overflow = original.overflow;
+      // Explicitly instant — the site sets `scroll-behavior: smooth`
+      // globally, which would otherwise turn "restore scroll position"
+      // into a slow, visible scroll-back animation over the whole page.
+      window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
       document.removeEventListener("keydown", handleKeyDown);
       previouslyFocused.current?.focus();
     };

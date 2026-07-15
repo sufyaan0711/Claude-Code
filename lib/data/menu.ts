@@ -49,7 +49,7 @@ export const menu: MenuItem[] = [
     price: "£42",
     image: { src: "/images/dish-ribeye.png", alt: "35-day dry-aged ribeye steak with bone marrow butter" },
     gridSpan: "col-span-12",
-    aspect: "aspect-[21/9]",
+    aspect: "aspect-[4/5] lg:aspect-[21/9]",
     featured: true,
   },
   {

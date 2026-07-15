@@ -94,37 +94,51 @@ export function ReservationPanel() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="reservation-heading"
-            className="texture-noise fixed inset-y-0 right-0 z-[80] flex w-full flex-col overflow-y-auto border-l border-brass/15 bg-soft-black sm:max-w-md"
+            className="fixed inset-y-0 right-0 z-[80] w-full max-w-full border-l border-brass/15 bg-soft-black sm:max-w-md"
+            style={{ height: "100dvh" }}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.5, ease: EASE_EDITORIAL }}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-warm-grey/10 px-6 py-6 sm:px-10 sm:py-8">
-              <div>
-                <p className="font-sans text-[0.68rem] uppercase tracking-[0.24em] text-brass">
-                  {restaurant.shortName}
-                </p>
-                <h2
-                  id="reservation-heading"
-                  className="mt-2 font-serif text-2xl text-cream sm:text-3xl"
-                >
-                  Reserve a Table
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={handleClose}
-                aria-label="Close reservation panel"
-                className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center border border-warm-grey/20 text-cream transition-colors duration-300 hover:border-brass hover:text-brass"
+            {/* `texture-noise` sets `position: relative`, which — at equal
+                CSS specificity — wins the cascade over the `fixed` utility
+                above when both land on the same element (Tailwind emits
+                utilities before this file's custom classes in the compiled
+                stylesheet, so source order breaks the tie). Keeping it on
+                an inner, non-fixed wrapper avoids that collision. */}
+            <div className="texture-noise flex h-full w-full flex-col overflow-y-auto">
+              <div
+                className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-warm-grey/10 bg-soft-black px-6 py-6 sm:px-10 sm:py-8"
+                style={{ paddingTop: "max(1.5rem, env(safe-area-inset-top))" }}
               >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.25" />
-                </svg>
-              </button>
-            </div>
+                <div>
+                  <p className="font-sans text-[0.68rem] uppercase tracking-[0.24em] text-brass">
+                    {restaurant.shortName}
+                  </p>
+                  <h2
+                    id="reservation-heading"
+                    className="mt-2 font-serif text-2xl text-cream sm:text-3xl"
+                  >
+                    Reserve a Table
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  aria-label="Close reservation panel"
+                  className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center border border-warm-grey/20 text-cream transition-colors duration-300 hover:border-brass hover:text-brass"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.25" />
+                  </svg>
+                </button>
+              </div>
 
-            <div className="flex-1 px-6 py-8 sm:px-10 sm:py-10">
+              <div
+                className="flex-1 px-6 py-8 sm:px-10 sm:py-10"
+                style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}
+              >
               {submitted ? (
                 <div role="status" className="flex flex-col items-start">
                   <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true" className="mb-6">
@@ -259,6 +273,7 @@ export function ReservationPanel() {
                   </fieldset>
                 </form>
               )}
+              </div>
             </div>
           </motion.div>
         </>

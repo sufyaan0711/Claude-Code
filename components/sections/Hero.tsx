@@ -1,28 +1,105 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ReserveButton } from "@/components/reservation/ReserveButton";
 import { EASE_EDITORIAL } from "@/lib/animation";
 import { restaurant } from "@/lib/data/restaurant";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { cn } from "@/lib/utils";
 
 const headingLines = ["STEAK.", "FIRE.", "YORKSHIRE."];
+const HERO_POSTER = "/images/hero-poster.jpg";
 
-/** Muted, autoplaying background video — no audio, no controls, fills its container via object-cover. */
+/**
+ * Muted, looping background video with a still-image fallback layer.
+ *
+ * Mobile browsers (iOS Safari in particular) sometimes ignore the JSX
+ * `muted`/`autoPlay` attributes on the very first server-rendered paint —
+ * a known gap between the HTML attribute and the DOM property that a
+ * purely client-side remount (e.g. navigating away and back) doesn't hit,
+ * which matches the "only works after visiting another page" symptom.
+ * Setting `.muted`/`.defaultMuted` imperatively via a ref before calling
+ * `.play()` closes that gap. The poster stays visible — and the browser
+ * never gets a chance to show its own "blocked autoplay" play button —
+ * until the video actually fires `playing`; if autoplay is refused
+ * outright, the poster simply stays up.
+ */
 function HeroVideo({ className }: { className?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+
+    const attemptPlay = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay blocked — the poster layer stays visible, no error surfaced.
+        });
+      }
+    };
+
+    attemptPlay();
+
+    const handlePlaying = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") attemptPlay();
+    };
+    const handlePageShow = () => attemptPlay();
+
+    video.addEventListener("playing", handlePlaying);
+    video.addEventListener("pause", handlePause);
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("pageshow", handlePageShow);
+
+    return () => {
+      video.removeEventListener("playing", handlePlaying);
+      video.removeEventListener("pause", handlePause);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("pageshow", handlePageShow);
+    };
+  }, []);
+
   return (
-    <video
-      className={className}
-      src="/videos/hero.mp4"
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="auto"
-      aria-hidden="true"
-    />
+    <div className={className}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative
+          fallback layer under a video; next/image's fill mode adds
+          overhead this tiny crossfade doesn't need */}
+      <img
+        src={HERO_POSTER}
+        alt=""
+        aria-hidden="true"
+        className={cn(
+          "absolute inset-0 z-10 h-full w-full object-cover object-center transition-opacity duration-700 ease-out",
+          isPlaying ? "opacity-0" : "opacity-100"
+        )}
+      />
+      <video
+        ref={videoRef}
+        className={cn(
+          "absolute inset-0 z-0 h-full w-full object-cover object-center transition-opacity duration-700 ease-out",
+          isPlaying ? "opacity-100" : "opacity-0"
+        )}
+        src="/videos/hero.mp4"
+        poster={HERO_POSTER}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        controls={false}
+        disablePictureInPicture
+        aria-hidden="true"
+      />
+    </div>
   );
 }
 
@@ -30,12 +107,12 @@ function HeroOverlay() {
   return (
     <>
       <motion.div
-        className="absolute inset-0 bg-gradient-to-t from-near-black via-near-black/55 to-near-black/10"
+        className="absolute inset-0 z-10 bg-gradient-to-t from-near-black via-near-black/55 to-near-black/10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.7, ease: EASE_EDITORIAL }}
       />
-      <div className="absolute inset-0 bg-gradient-to-tr from-oxblood/25 via-transparent to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-tr from-oxblood/25 via-transparent to-transparent" />
     </>
   );
 }
@@ -145,7 +222,7 @@ export function Hero() {
   if (!expansionEnabled) {
     return (
       <section className="relative flex h-[100dvh] min-h-[640px] items-end overflow-hidden bg-near-black">
-        <HeroVideo className="absolute inset-0 h-full w-full object-cover" />
+        <HeroVideo className="absolute inset-0 h-full w-full" />
         <HeroOverlay />
         <HeroContent />
         <ScrollIndicator />
@@ -160,8 +237,8 @@ export function Hero() {
           style={{ width, borderRadius: radius }}
           className="relative mx-auto h-full overflow-hidden bg-near-black"
         >
-          <motion.div style={{ scale }} className="h-full w-full">
-            <HeroVideo className="h-full w-full object-cover" />
+          <motion.div style={{ scale }} className="relative h-full w-full">
+            <HeroVideo className="relative h-full w-full" />
           </motion.div>
           <HeroOverlay />
         </motion.div>

@@ -3,41 +3,52 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { useIsTabletUp } from "@/lib/useIsTabletUp";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { RevealText } from "@/components/ui/RevealText";
 
 type ExpandingStoryProps = {
   /** Fills the animated (scroll-linked) frame — sized via `h-full w-full`. */
   media: React.ReactNode;
-  /** Fills the static, reduced-motion frame — sized via `aspect-video w-full`. */
+  /** Fills the static frame (mobile, and desktop under reduced motion) —
+   * carries its own responsive aspect ratio, see app/page.tsx. */
   reducedMotionMedia: React.ReactNode;
 };
 
 /**
- * The site's central visual moment: the image widens and its corners
- * sharpen as the visitor scrolls through a tall track, while a sticky
- * child keeps it centred in the viewport. Scroll-linked, not
- * trigger-once — and skipped entirely under prefers-reduced-motion,
- * where the image renders at a fixed, comfortable width instead.
+ * The site's central visual moment. At 768px and above, with motion
+ * allowed, the image widens and its corners sharpen as the visitor scrolls
+ * through a short pinned track — scroll-linked, not trigger-once. Below
+ * 768px, and under prefers-reduced-motion at any width, the pin is skipped
+ * entirely: the image sits in normal document flow at a comfortable,
+ * near-full-width size with only a brief reveal animation, so mobile
+ * visitors are never stuck scrolling through a tall empty section.
  *
  * Both `media` props are rendered by the server-component page and passed
- * in — see Hero.tsx for why.
+ * in — see Hero.tsx for why. Motion's useScroll recalculates its offsets
+ * on resize/layout changes internally, so no manual refresh wiring is
+ * needed here.
  */
 export function ExpandingStory({ media, reducedMotionMedia }: ExpandingStoryProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
+  const isTabletUp = useIsTabletUp();
+  const expansionEnabled = isTabletUp && !reducedMotion;
 
   const { scrollYProgress } = useScroll({
     target: trackRef,
-    offset: ["start end", "end start"],
+    offset: ["start start", "end start"],
   });
 
-  const width = useTransform(scrollYProgress, [0.1, 0.65], ["68%", "96%"]);
-  const radius = useTransform(scrollYProgress, [0.1, 0.65], [28, 3]);
-  const scale = useTransform(scrollYProgress, [0.1, 0.65], [1.08, 1]);
+  // Roughly half the previous scroll distance (120vh vs 260vh) and the
+  // animation now runs across most of that shorter pin, so it completes
+  // in well under half the previous scroll — and wall-clock time.
+  const width = useTransform(scrollYProgress, [0, 0.6], ["72%", "94%"]);
+  const radius = useTransform(scrollYProgress, [0, 0.6], [24, 4]);
+  const scale = useTransform(scrollYProgress, [0, 0.6], [1.05, 1]);
 
   return (
-    <section id="story" className="relative bg-near-black py-28 lg:py-40">
+    <section id="story" className="relative bg-near-black py-20 lg:py-32">
       <div className="mx-auto max-w-[1500px] px-6 lg:px-12">
         <div className="max-w-2xl">
           <RevealText>
@@ -60,12 +71,8 @@ export function ExpandingStory({ media, reducedMotionMedia }: ExpandingStoryProp
         </div>
       </div>
 
-      {reducedMotion ? (
-        <div className="mx-auto my-20 w-[86%] max-w-[1400px] lg:my-28">
-          <div className="relative overflow-hidden rounded-[10px]">{reducedMotionMedia}</div>
-        </div>
-      ) : (
-        <div ref={trackRef} className="relative my-8 h-[260vh] lg:my-12">
+      {expansionEnabled ? (
+        <div ref={trackRef} className="relative my-8 h-[120vh] lg:my-10">
           <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
             <motion.div
               style={{ width, borderRadius: radius }}
@@ -76,6 +83,12 @@ export function ExpandingStory({ media, reducedMotionMedia }: ExpandingStoryProp
               </motion.div>
             </motion.div>
           </div>
+        </div>
+      ) : (
+        <div className="mx-auto my-12 w-[92%] max-w-[1400px] sm:my-16">
+          <RevealText>
+            <div className="relative overflow-hidden rounded-[10px]">{reducedMotionMedia}</div>
+          </RevealText>
         </div>
       )}
 
